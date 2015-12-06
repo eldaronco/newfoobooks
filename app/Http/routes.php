@@ -11,14 +11,16 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/books', function() {
-    return 'Here are all the books...';
-});
+Route::get('/', 'BookController@getIndex');
+Route::get('/books', 'BookController@getIndex');
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/books/create', 'BookController@getCreate');
+    Route::post('/books/create', 'BookController@postCreate');
 
+    Route::get('/books/edit/{id?}', 'BookController@getEdit');
+    Route::post('/books/edit', 'BookController@postEdit');
+});
 
 Route::get('/books/show/{title?}', 'BookController@getShow');
 
@@ -43,7 +45,7 @@ Route::post('/new', function() {
 
 });
 
-Route::get('/practice', function() {
+/*Route::get('/practice', function() {
 
     $data = Array('foo' => 'bar');
     Debugbar::info($data);
@@ -53,7 +55,12 @@ Route::get('/practice', function() {
 
     return 'Practice';
 
-});
+}); */
+/*----------------------------------------------------
+/practice
+-----------------------------------------------------*/
+Route::controller('/practice','PracticeController');
+
 
 Route::get('/debug', function() {
 
@@ -91,3 +98,34 @@ Route::get('/debug', function() {
 });
 
 Route::resource('tag', 'TagController');
+
+# Show login form
+Route::get('/login', 'Auth\AuthController@getLogin');
+
+# Process login form
+Route::post('/login', 'Auth\AuthController@postLogin');
+
+# Process logout
+Route::get('/logout', 'Auth\AuthController@getLogout');
+
+# Show registration form
+Route::get('/register', 'Auth\AuthController@getRegister');
+
+# Process registration form
+Route::post('/register', 'Auth\AuthController@postRegister');
+
+Route::get('/confirm-login-worked', function() {
+
+    # You may access the authenticated user via the Auth facade
+    $user = Auth::user();
+
+    if($user) {
+        echo 'You are logged in.';
+        dump($user->toArray());
+    } else {
+        echo 'You are not logged in.';
+    }
+
+    return;
+
+});
